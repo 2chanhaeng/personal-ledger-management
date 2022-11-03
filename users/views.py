@@ -28,3 +28,25 @@ class SignUpView(APIView):
         user.save()
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+
+class LoginView(APIView):
+    def post(self, request: Request) -> Response:
+        """
+        로그인
+        POST /api/v1/users/login
+        """
+
+        email: Final = request.data.get("email")
+        password: Final = request.data.get("password")
+        if not email or not password:
+            raise ParseError("Username or password is required.")
+        user: Final = authenticate(request, email=email, password=password)
+        if not user:
+            return Response(
+                {"detail": "Invalid user data."},
+                status=HTTP_400_BAD_REQUEST,
+            )
+        login(request, user)
+        # TODO: create JWT token and response
+        return Response({"status": True})
