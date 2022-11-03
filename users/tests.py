@@ -5,6 +5,11 @@ from .models import User
 
 
 class TestUserModel(APITestCase):
+    def setUp(self) -> None:
+        self.VALIDED_USERNAME = "valided_username"
+        self.VALIDED_EMAIL = "valided_email@valided_email.com"
+        self.VALIDED_PASSWORD = "password"
+
     def test_create_user(self):
         try:
             self.unvailded_email_user = User.objects.create(
@@ -18,14 +23,12 @@ class TestUserModel(APITestCase):
             raise e
         else:
             AssertionError("unvailded_email_user is created.")
-        VALIDED_EMAIL: Final = "valided_email@valided_email.com"
         user = User.objects.create(
-            username="valided_username",
-            email=VALIDED_EMAIL,
-            password="password",
+            username=self.VALIDED_USERNAME,
+            email=self.VALIDED_USERNAME,
+            password=self.VALIDED_PASSWORD,
         )
-        print("test_create_user", user.username)
-        self.assertEqual(user.email, VALIDED_EMAIL)
+        self.assertEqual(user.email, self.VALIDED_USERNAME)
 
 
 class TestUserView(APITestCase):
@@ -36,15 +39,19 @@ class TestUserView(APITestCase):
 
     def test_signup(self):
         response = self.client.post(
-            "/api/v1/users/",
+            "/api/v1/users/signup/",
             {
                 "username": self.VALIDED_USERNAME,
                 "email": self.VALIDED_EMAIL,
                 "password": self.VALIDED_PASSWORD,
             },
         )
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data["email"], self.VALIDED_EMAIL)
+        try:
+            self.assertEqual(response.status_code, 201)
+            self.assertEqual(response.data["email"], self.VALIDED_EMAIL)
+        except AssertionError as e:
+            print(response.data)
+            raise e
 
     def test_login(self):
         response = self.client.post(
