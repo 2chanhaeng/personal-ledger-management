@@ -35,7 +35,8 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
+SYSTEM_APPS = [
+    # 시스템 앱
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -43,6 +44,20 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
+
+THIRD_PARTY_APPS = [
+    # 서드파티 앱
+    'rest_framework',
+]
+
+CUSTOM_APPS = [
+    # 커스템 앱
+    "users.apps.UsersConfig",
+    "ledger.apps.LedgerConfig",
+]
+
+INSTALLED_APPS = SYSTEM_APPS + THIRD_PARTY_APPS + CUSTOM_APPS
+# 설치된 앱
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
