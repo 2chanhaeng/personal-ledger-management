@@ -26,3 +26,10 @@ class TestUserModel(APITestCase):
         )
         print("test_create_user", user.username)
         self.assertEqual(user.email, VALIDED_EMAIL)
+
+
+class TestUserView(APITestCase):
+    def setUp(self) -> None:
+        self.VALIDED_USERNAME = "valided_username"
+        self.VALIDED_EMAIL = "valided_email@valided_email.com"
+        self.VALIDED_PASSWORD = "password"
