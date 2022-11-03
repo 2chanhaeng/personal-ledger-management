@@ -50,3 +50,16 @@ class LoginView(APIView):
         login(request, user)
         # TODO: create JWT token and response
         return Response({"status": True})
+
+
+class LogoutView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        """
+        로그아웃
+        POST /api/v1/users/logout
+        """
+        logout(request)
+        return Response({"status": True})
