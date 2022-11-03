@@ -45,3 +45,14 @@ class TestUserView(APITestCase):
         )
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["email"], self.VALIDED_EMAIL)
+
+    def test_login(self):
+        response = self.client.post(
+            "/api/v1/users/login/",
+            {
+                "email": self.VALIDED_EMAIL,
+                "password": self.VALIDED_PASSWORD,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["status"], True)
