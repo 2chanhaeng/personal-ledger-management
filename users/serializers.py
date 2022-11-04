@@ -11,9 +11,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         email = attrs.get("email")
-        password = attrs.get("password")
         if not email:
             raise serializers.ValidationError("Email is required.")
+        password = attrs.get("password")
         if not password:
             raise serializers.ValidationError("Password is required.")
         attrs["username"] = email
