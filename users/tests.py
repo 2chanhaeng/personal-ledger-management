@@ -33,9 +33,13 @@ class TestUserModel(APITestCase):
 
 class TestUserView(APITestCase):
     def setUp(self) -> None:
-        self.VALIDED_USERNAME = "valided_username"
-        self.VALIDED_EMAIL = "valided_email@valided_email.com"
+        self.VALIDED_EMAIL = "valided@email.com"
         self.VALIDED_PASSWORD = "password"
+        self.VALIDED_USER = User.objects.create(
+            username=self.VALIDED_EMAIL + "2",
+            email=self.VALIDED_EMAIL + "2",
+            password=self.VALIDED_PASSWORD,
+        )
 
     def test_signup(self):
         response = self.client.post(
