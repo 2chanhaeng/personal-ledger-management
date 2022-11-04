@@ -53,8 +53,8 @@ class TestUserView(APITestCase):
         try:
             self.assertEqual(response.status_code, 201)
             self.assertEqual(response.data["email"], self.VALIDED_EMAIL)
-        except AssertionError as wrong:
-            raise wrong(response.data)
+        except AssertionError:
+            raise AssertionError(response.data)
 
     def test_login(self):
         login_data: Final = {
@@ -67,21 +67,38 @@ class TestUserView(APITestCase):
         )
         try:
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.data["status"], True)
-        except AssertionError as wrong:
-            raise wrong(
-                login_data,
-                User.objects.get(username=self.VALIDED_USER.email),
+        except AssertionError:
+            raise AssertionError(
                 response.data,
             )
 
     def test_logout(self):
-        self.client.force_login(self.VALIDED_USER)
-        response: Final[Response] = self.client.get(
+        # login
+        login_data: Final = {
+            "email": self.VALIDED_USER.email,
+            "password": self.VALIDED_USER.password,
+        }
+        logged_response: Final[Response] = self.client.post(
+            "/api/v1/users/login/",
+            login_data,
+        )
+        # get tokens
+        refresh = logged_response.cookies["refresh"].value
+        access = logged_response.cookies["access"].value
+        # request logout with tokens
+        response: Final[Response] = self.client.post(
             "/api/v1/users/logout/",
+            {"refresh": refresh},
+            HTTP_AUTHORIZATION=f"Bearer {access}",
         )
         try:
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.data["status"], True)
-        except AssertionError as wrong:
-            raise wrong(response.data)
+        except AssertionError:
+            raise AssertionError(
+                response.data,
+            )
+        except Exception:
+            raise Exception(
+                response.data,
+            )
