@@ -1,6 +1,7 @@
 from typing import Final
 from django.db import IntegrityError
 from rest_framework.test import APITestCase
+from rest_framework.response import Response
 from .models import User
 
 
@@ -23,7 +24,7 @@ class TestUserModel(APITestCase):
             raise e
         else:
             AssertionError("unvailded_email_user is created.")
-        user = User.objects.create(
+        user: Final = User.objects.create(
             username=self.VALIDED_USERNAME,
             email=self.VALIDED_USERNAME,
             password=self.VALIDED_PASSWORD,
@@ -42,10 +43,9 @@ class TestUserView(APITestCase):
         )
 
     def test_signup(self):
-        response = self.client.post(
+        response: Final[Response] = self.client.post(
             "/api/v1/users/signup/",
             {
-                "username": self.VALIDED_USERNAME,
                 "email": self.VALIDED_EMAIL,
                 "password": self.VALIDED_PASSWORD,
             },
@@ -53,28 +53,35 @@ class TestUserView(APITestCase):
         try:
             self.assertEqual(response.status_code, 201)
             self.assertEqual(response.data["email"], self.VALIDED_EMAIL)
-        except AssertionError as e:
-            print(response.data)
-            raise e
+        except AssertionError as wrong:
+            raise wrong(response.data)
 
     def test_login(self):
-        response = self.client.post(
+        login_data: Final = {
+            "email": self.VALIDED_USER.email,
+            "password": self.VALIDED_USER.password,
+        }
+        response: Final[Response] = self.client.post(
             "/api/v1/users/login/",
-            {
-                "email": self.VALIDED_EMAIL,
-                "password": self.VALIDED_PASSWORD,
-            },
+            login_data,
         )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["status"], True)
+        try:
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data["status"], True)
+        except AssertionError as wrong:
+            raise wrong(
+                login_data,
+                User.objects.get(username=self.VALIDED_USER.email),
+                response.data,
+            )
 
     def test_logout(self):
-        response = self.client.post(
+        self.client.force_login(self.VALIDED_USER)
+        response: Final[Response] = self.client.get(
             "/api/v1/users/logout/",
-            {
-                "email": self.VALIDED_EMAIL,
-                "password": self.VALIDED_PASSWORD,
-            },
         )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["status"], True)
+        try:
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data["status"], True)
+        except AssertionError as wrong:
+            raise wrong(response.data)
