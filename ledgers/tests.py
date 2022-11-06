@@ -61,3 +61,28 @@ class LedgersViewTest(APITestCase):
             )
         except AssertionError:
             raise AssertionError(response.data)
+
+    def test_get_ledgers(self):
+        ledger: Final = Ledger.objects.create(
+            user=self.VALIDED_USER,
+            **self.VALIDED_LEDGER_DATA
+        )
+        response: Final[Response] = self.client.get(
+            "/api/v1/ledgers/",
+            HTTP_AUTHORIZATION=self.HTTP_AUTHORIZATION,
+        )
+        serialzed = LedgersSerializer(ledger)
+        try:
+            self.assertEqual(response.status_code, 200)
+        except AssertionError:
+            raise AssertionError(
+                f"The status code is {response.status_code}."
+            )
+        for name, data in serialzed.data.items():
+            try:
+                self.assertEqual(response.data[0].get(name), data)
+            except AssertionError:
+                raise AssertionError(
+                    f"{name}: {data} != {response.data[0].get(name)}\n"
+                    + f"{response.data}"
+                )
