@@ -47,3 +47,23 @@ class LedgersView(APIView):
             raise ParseError(serializer.errors, code=HTTP_400_BAD_REQUEST)
         serializer.save()
         return Response(serializer.data, status=HTTP_201_CREATED)
+
+
+class LedgerDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request: Request, ledger_id: int) -> Response:
+        """
+        가계부 상세 조회
+        GET /api/v1/ledgers/<ledger_id>/
+        """
+        user: Final[User] = request.user
+        ledger: Final[Ledger] = user.ledgers.filter(id=ledger_id)
+        if not ledger.exists():
+            return Response(
+                {"detail": f"Ledger with id {ledger_id} does not exist."},
+                status=HTTP_404_NOT_FOUND,
+            )
+        serializer: Final = LedgerDetailSerializer(ledger.first())
+        return Response(serializer.data)
