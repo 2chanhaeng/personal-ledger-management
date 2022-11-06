@@ -14,3 +14,10 @@ class LedgerDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ledger
         fields = ("amount", "memo", "info", "created_at", "deleted_at")
+
+
+class LedgerCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Ledger
+        fields = ("user", "amount", "memo", "info")
