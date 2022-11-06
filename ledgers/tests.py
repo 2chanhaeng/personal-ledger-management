@@ -5,7 +5,6 @@ from .models import Ledger
 from .serializers import LedgerDetailSerializer, LedgersSerializer
 from users.models import User
 
-# Create your tests here.
 
 class LedgersViewTest(APITestCase):
     def get_login_cookies(self) -> Dict[str, str]:
@@ -41,3 +40,24 @@ class LedgersViewTest(APITestCase):
         self.ACCESS = self.COOKIES.get("access")
         self.REFRESH = self.COOKIES.get("refresh")
         self.HTTP_AUTHORIZATION = f"Bearer {self.ACCESS}"
+
+    def test_create_ledger(self):
+        response: Final[Response] = self.client.post(
+            "/api/v1/ledgers/",
+            self.VALIDED_LEDGER_DATA,
+            HTTP_AUTHORIZATION=self.HTTP_AUTHORIZATION,
+            format="json",
+        )
+        try:
+            self.assertEqual(response.status_code, 201)
+        except AssertionError:
+            raise AssertionError(
+                f"Expected status code 201, but got {response.status_code}."
+            )
+        try:
+            self.assertEqual(
+                response.data["amount"],
+                self.VALIDED_LEDGER_DATA["amount"]
+            )
+        except AssertionError:
+            raise AssertionError(response.data)
