@@ -33,6 +33,7 @@
 
 - `ledgers`: 가계부 기록 모델
   - `id`: 가계부 기록의 고유한 식별자
+  - `user`: 가계부 기록을 작성한 사용자
   - `amount`: 사용 금액
   - `memo`: 사용 메모
   - `info`: 사용 정보
@@ -72,7 +73,9 @@
 - Request URL: `api/v1/ledgers`
 - Request Body:
   ```json
+  # 성공시 201
   {
+    "user": 작성자,
     "amount": 사용 금액,
     "memo": 사용 메모,
     "info": {
@@ -80,6 +83,7 @@
         ...
     }
   }
+  # 실패시 400
   ```
 - Response: 성공시 201, 실패시 400
 
@@ -89,6 +93,7 @@
 - Request URL: `api/v1/ledgers`
 - Reponce Body:
   ```json
+  # 성공시 200
   [
     {
       "id": 가계부 기록의 고유한 식별자,
@@ -97,6 +102,7 @@
     },
     ...
   ]
+  # 실패시 400
   ```
 
 ### 가계부 개별 기록 조회
@@ -105,6 +111,7 @@
 - Request URL: `api/v1/ledgers/<ledger_id>`
 - Reponse Body:
   ```json
+  # 성공시 200
   {
     "id": 가계부 기록의 고유한 식별자,
     "amount": 사용 금액,
@@ -115,6 +122,8 @@
     },
     "created_at": 가계부 기록 생성 시간
   }
+  # 요청한 사용자가 조회할 수 없는 기록을 요청한 경우 401
+  # 해당 id를 가진 기록이 없는 경우 404
   ```
 
 ### 가계부 기록 수정
